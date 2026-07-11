@@ -4,6 +4,7 @@ title: OKF Management Guide
 description: Universal house OKF standard — workspaces, directory classes,
   house schema, types, linking, sync, registry, bootstrap, and validation
   rules.
+resource: https://github.com/xcspl/xyno-okf-guide
 tags: [okf, conventions, meta, knowledge-management]
 timestamp: '2026-07-12'
 status: active
@@ -31,6 +32,15 @@ guide pins down the choices the spec deliberately leaves open. Where
 the two disagree, this guide wins inside workspaces that adopt it; the
 spec's *consumption* rules (tolerate unknown types, broken links, extra
 keys) always apply.
+
+**This standard is published at
+<https://github.com/xcspl/xyno-okf-guide>**, alongside its reference
+validator
+([`okf-validate.py`](https://github.com/xcspl/xyno-okf-guide/blob/main/okf-validate.py))
+and an adoption README. That repo is the shared distribution point —
+if you were handed only this file, everything else lives there. It is
+not a privileged deployment: workspaces vendor this file into their
+registry (§8) and may extend their copy (§3).
 
 ---
 
@@ -325,9 +335,11 @@ registry tracks the state.
 ## 9. Validation
 
 Conformance is checkable mechanically, not by eyeball. The reference
-validator (`okf-validate.py`, shipped alongside this guide in the
-standard's repo; stdlib + PyYAML) checks a bundle root and exits
-nonzero on errors:
+validator
+([`okf-validate.py`](https://github.com/xcspl/xyno-okf-guide/blob/main/okf-validate.py),
+in the standard's public repo alongside this guide; stdlib + PyYAML)
+checks a bundle root and exits nonzero on errors —
+`python3 okf-validate.py <bundle-root>`:
 
 **Errors (violate this standard):**
 
