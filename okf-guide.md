@@ -6,7 +6,7 @@ description: Universal house OKF standard — workspaces, directory classes,
   rules.
 resource: https://github.com/xcspl/xyno-okf-guide
 tags: [okf, conventions, meta, knowledge-management]
-timestamp: '2026-07-12'
+timestamp: '2026-07-25'
 status: active
 ---
 
@@ -210,6 +210,52 @@ written.
   bundle changes under `## YYYY-MM-DD` headings. Use once a bundle is
   active enough that "what changed lately" isn't obvious from git.
 - Both filenames are **reserved** — never use them for concept docs.
+
+### Splitting oversized docs (document altitude)
+
+A concept doc holds **one concept** — two things belong in one doc only
+when they are read and change together. Navigation happens on
+frontmatter: readers decide whether to open a doc from its
+`title`/`description`/`tags` alone, so those few lines are the access
+gate to the whole body. The bigger the body, the more that gate
+carries — and the more one wrong sentence up top costs (a relevant doc
+skipped, or an irrelevant one loaded whole). The validator (§9) checks
+only that a `description` exists, never that it is faithful; this rule
+is the human/agent half of that contract.
+
+**When to split** (any one is sufficient):
+
+1. **The description test:** you cannot honestly summarize the body in
+   one sentence without resorting to "and". A `description` that has
+   become a list is a splitting signal, not a writing problem.
+2. **Divergent handling:** parts of the doc are read, updated, or
+   consulted on different occasions (e.g. a setup procedure fused with
+   an incident history — one is a `Playbook`, the other an
+   `Investigation`).
+3. **Section-as-doc:** a `#`/`##` section has grown to where it would
+   stand alone with its own type, description, and inbound links.
+
+**How to split:**
+
+1. Extract each concept into its own doc — faithful frontmatter, correct
+   `type` (pieces of one doc often want *different* types), `sources`
+   carried to whichever piece derives from them.
+2. Decide the old path's fate: keep it as the dominant concept
+   (slimmed), or delete it. Either way, splitting changes concept IDs —
+   grep the bundle for the old path and update every inbound link **and
+   the directory's `index.md` in the same commit** (same discipline as
+   re-tiering rule 4 below).
+3. If the split produces a themed cluster, that may in turn trigger
+   tiering (below) — splitting and tiering are the same pressure at two
+   altitudes: doc → docs, then docs → subdirectory.
+
+**Exception — genuinely indivisible bodies** (a licence agreement, a
+transcript, a long specification): don't force a split that destroys
+the artifact's integrity. Instead treat it like an asset: make the
+`description` an abstract of *coverage* ("covers X, Y, Z"), load `tags`
+with every subject it touches, and if needed add a small companion map
+doc that points into its sections. A large doc that must exist should
+be reachable through a small, well-described one.
 
 ### Tiering: subdirectories for compartmentalized knowledge (optional)
 
