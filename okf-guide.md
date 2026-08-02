@@ -6,7 +6,7 @@ description: Universal house OKF standard — workspaces, directory classes,
   rules.
 resource: https://github.com/xcspl/xyno-okf-guide
 tags: [okf, conventions, meta, knowledge-management]
-timestamp: '2026-07-25'
+timestamp: '2026-08-03'
 status: active
 ---
 
@@ -23,7 +23,7 @@ into a workspace's registry (§8) unchanged. No copy is privileged; the
 standard author's own PC follows the same rules as any partner's
 machine.
 
-The underlying format is the [Open Knowledge Format (OKF) v0.1
+The underlying format is the [Open Knowledge Format (OKF)
 spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 (`GoogleCloudPlatform/knowledge-catalog`): markdown files with YAML
 frontmatter, organized in a directory tree ("bundle"), cross-linked
@@ -32,6 +32,19 @@ guide pins down the choices the spec deliberately leaves open. Where
 the two disagree, this guide wins inside workspaces that adopt it; the
 spec's *consumption* rules (tolerate unknown types, broken links, extra
 keys) always apply.
+
+**Upstream alignment: this standard is current with OKF v0.2**
+(reviewed 2026-08-03). v0.2 is additive and backward-compatible, and
+every rule here remains conformant with it. Two deliberate positions
+follow from that review:
+
+- Bundles keep declaring `okf_version: "0.1"` (§1). That stays
+  accurate — a v0.1 bundle is a valid v0.2 bundle. Declaring `"0.2"`
+  would assert use of the v0.2 trust vocabulary, which this standard
+  does not adopt.
+- v0.2 introduced its own meanings for `sources` and `status`. This
+  standard reserves the upstream names and uses its own where they
+  differ — see §2.
 
 **This standard is published at
 <https://github.com/xcspl/xyno-okf-guide>**, alongside its reference
@@ -134,10 +147,59 @@ carries:
 |---|---|
 | `tags` | YAML list; cross-cutting subjects ("what is it about"). |
 | `resource` | URI/path of the underlying asset the doc describes. |
-| `sources` | YAML list of repo paths this doc derives from — the staleness hook (§6). |
+| `derived_from` | YAML list of repo paths this doc derives from — the staleness hook (§6). |
 
 Extra keys are always allowed (the spec guarantees consumers tolerate
 them). If a new key proves broadly useful, promote it into this table.
+
+### Upstream v0.2 keys — reserved, not used
+
+OKF v0.2 added a *trust vocabulary* — provenance, lifecycle, and
+attestation fields — on top of v0.1. This standard does not adopt it,
+and **does not reuse any of its key names for different meanings.**
+Treat `sources`, `generated`, `verified`, `stale_after`, and
+`usage_window` as reserved: if a doc carries one, it MUST carry the
+upstream meaning below, not a house meaning.
+
+**`sources` (upstream) — provenance, not a path list.** In v0.2 this is
+a list of *objects* recording the material a concept derives from, each
+with a required `resource` plus optional `id`, `title`, `author`,
+`usage_count`, and `last_modified`. The extra keys are credibility
+signals: v0.2 deliberately publishes signals rather than a computed
+score, leaving consumers to judge trustworthiness themselves.
+
+```yaml
+# upstream v0.2 shape — a list of objects
+sources:
+  - id: ga4-schema
+    resource: https://developers.google.com/analytics/bigquery/export-schema
+    title: GA4 BigQuery Export schema
+    author: team:ga4-docs
+    last_modified: 2026-05-30
+```
+
+This house standard had already claimed `sources` for a simpler,
+narrower idea: a flat list of repo paths driving the staleness query
+(§6 rule 3). The *intent* converges — both answer "what does this doc derive
+from, and might it have moved on?" — but the **shapes are
+incompatible**: a consumer expecting mappings would break on a list of
+strings. So the house key is named **`derived_from`**, leaving `sources`
+free to mean exactly what upstream says if this workspace ever adopts
+v0.2 provenance. The two can then coexist on one doc.
+
+The other reserved keys, for reference: `generated: {by, at}` and
+`verified: [{by, at}]` record who produced or confirmed content and
+when; `stale_after: YYYY-MM-DD` declares an absolute expiry (a concept
+is stale when today >= that date).
+
+**`status` — same key, different vocabulary.** v0.2 defines `status` as
+`draft | stable | deprecated`. This standard keeps its own five values
+(§2 above), which encode distinctions upstream cannot express —
+`superseded` and `reverted` are not the same event as `deprecated`, and
+`superseded` carries a linking obligation (§6 rule 4). Unknown `status`
+values are tolerated by the spec, so this costs no conformance. The
+rough mapping, if a bundle is ever exported upstream: `idea`→`draft`,
+`active`→`stable`, `superseded`/`reverted`/`archived`→`deprecated`.
 
 **Naming conventions:**
 
@@ -248,8 +310,8 @@ is the human/agent half of that contract.
 **How to split:**
 
 1. Extract each concept into its own doc — faithful frontmatter, correct
-   `type` (pieces of one doc often want *different* types), `sources`
-   carried to whichever piece derives from them.
+   `type` (pieces of one doc often want *different* types),
+   `derived_from` carried to whichever piece derives from them.
 2. Decide the old path's fate: keep it as the dominant concept
    (slimmed), or delete it. Either way, splitting changes concept IDs —
    grep the bundle for the old path and update every inbound link **and
@@ -316,11 +378,11 @@ chores:
 2. **Reference, don't restate:** the less a doc duplicates, the less can
    go stale. Docs carry the knowledge the project can't express (why,
    decisions, gotchas, relationships) and link to everything else.
-3. **Staleness is a query, not a feeling:** a doc with `sources:` is stale
-   if any listed path changed (git log / mtime) after the doc's
+3. **Staleness is a query, not a feeling:** a doc with `derived_from:` is
+   stale if any listed path changed (git log / mtime) after the doc's
    `timestamp`. Check per-repo when suspicious:
    ```
-   git log --oneline --since=<doc timestamp> -- <each sources path>
+   git log --oneline --since=<doc timestamp> -- <each derived_from path>
    ```
    Any hits → review and refresh the doc (or mark it `status: archived`).
 4. **Delete vs archive:** archive (`status: archived`) when the history
@@ -340,7 +402,7 @@ Mechanical recipe, executable in any session:
    self-identifying `index.md` (§1).
 3. **Write concept docs** from existing material — README, docs, code
    layout, git history, changelogs. Obey reference-don't-restate; type per
-   §3; house frontmatter per §2; set `sources:` on anything derived.
+   §3; house frontmatter per §2; set `derived_from:` on anything derived.
    Start small: only concepts with real content today.
 4. **Build indexes** (§5) for every bundle directory.
 5. **Validate** the bundle (§9) and fix every error.
