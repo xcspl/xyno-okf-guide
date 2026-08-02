@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 RESERVED = {"index.md", "log.md"}
-REQUIRED_KEYS = ("type", "title", "description", "timestamp")
+REQUIRED_KEYS = ("type", "title", "description", "timestamp", "status")
 STATUS_VOCAB = {"active", "idea", "superseded", "reverted", "archived"}
 LINK_RE = re.compile(r"\]\(([^)#\s]+)\)")
 
@@ -78,9 +78,15 @@ def validate_bundle(root: Path) -> tuple[list[str], list[str]]:
         if fm is None:
             err(path, "missing or unparseable YAML frontmatter")
             continue
-        missing = [k for k in REQUIRED_KEYS if not fm.get(k)]
+        missing = [k for k in REQUIRED_KEYS if k not in fm]
         if missing:
             err(path, f"missing required frontmatter keys: {', '.join(missing)}")
+            continue
+        empty_required = [k for k in ("type", "title", "description")
+                          if fm.get(k) is None or str(fm.get(k)).strip() == ""]
+        if empty_required:
+            err(path, f"required frontmatter values cannot be empty: {', '.join(empty_required)}")
+            continue
 
         status = fm.get("status")
         if status and status not in STATUS_VOCAB:

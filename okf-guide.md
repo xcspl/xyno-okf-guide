@@ -115,7 +115,18 @@ carries:
 | `type` | Kind of document — see §3. |
 | `title` | Human-readable display name. |
 | `description` | One sentence; used by indexes, search, previews. |
-| `timestamp` | ISO 8601 date(-time) of last meaningful change. |
+| `timestamp` | ISO 8601 date(-time) of last meaningful change/verification. |
+| `status` | Lifecycle state — `active` \| `idea` \| `superseded` \| `reverted` \| `archived`. |
+
+> **Explicit `timestamp` and `status` rule:**
+> Knowledge decay is a primary cause of stale, unmaintained, or misleading
+> documentation. To prevent outdated knowledge files from masquerading as
+> current truth, **every concept doc MUST explicitly include both `timestamp`
+> and `status` keys in its YAML frontmatter, even if empty** (e.g., `timestamp:`
+> or `status:` when pending initial date or status assignment). `timestamp`
+> records when the content was created or last verified, while `status`
+> records its lifecycle state. Explicit keys ensure that recency and validity
+> are never ambiguous to readers or automated agent sessions.
 
 **Optional but standardized (use these names, not variants):**
 
@@ -123,7 +134,6 @@ carries:
 |---|---|
 | `tags` | YAML list; cross-cutting subjects ("what is it about"). |
 | `resource` | URI/path of the underlying asset the doc describes. |
-| `status` | One of `active` \| `idea` \| `superseded` \| `reverted` \| `archived`. |
 | `sources` | YAML list of repo paths this doc derives from — the staleness hook (§6). |
 
 Extra keys are always allowed (the spec guarantees consumers tolerate
@@ -390,8 +400,10 @@ checks a bundle root and exits nonzero on errors —
 **Errors (violate this standard):**
 
 - A non-reserved `.md` file with missing/unparseable YAML frontmatter.
-- Required keys (§2) absent or empty: `type`, `title`, `description`,
-  `timestamp`.
+- Required keys (§2) absent from frontmatter: `type`, `title`, `description`,
+  `timestamp`, `status` (keys must be present; `type`, `title`, `description`
+  must also be non-empty, while `timestamp` and `status` keys must be explicitly
+  declared even if their values are temporarily empty).
 - A bundle-root `index.md` without `okf_version` + `bundle`
   frontmatter (§1).
 - An `index.md` entry whose link target does not exist — indexes are
