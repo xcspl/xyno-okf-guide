@@ -33,18 +33,19 @@ the two disagree, this guide wins inside workspaces that adopt it; the
 spec's *consumption* rules (tolerate unknown types, broken links, extra
 keys) always apply.
 
-**Upstream alignment: this standard is current with OKF v0.2**
-(reviewed 2026-08-03). v0.2 is additive and backward-compatible, and
-every rule here remains conformant with it. Two deliberate positions
-follow from that review:
+**Upstream alignment: this standard adopts OKF v0.2** (adopted
+2026-08-03, after an initial reserve-only review the same day). v0.2 is
+additive and backward-compatible with v0.1. Two positions follow from
+adoption:
 
-- Bundles keep declaring `okf_version: "0.1"` (§1). That stays
-  accurate — a v0.1 bundle is a valid v0.2 bundle. Declaring `"0.2"`
-  would assert use of the v0.2 trust vocabulary, which this standard
-  does not adopt.
-- v0.2 introduced its own meanings for `sources` and `status`. This
-  standard reserves the upstream names and uses its own where they
-  differ — see §2.
+- Bundles declare `okf_version: "0.2"` (§1), asserting use of the v0.2
+  **trust vocabulary** with upstream meanings — see §2. The former
+  house key `derived_from` is retired; its role is carried by upstream
+  `sources` (each entry's `resource` is the staleness hook, §6).
+- `status` keeps the house five-value vocabulary (§2), which encodes
+  distinctions upstream's `draft | stable | deprecated` cannot express.
+  Unknown `status` values are tolerated by the spec; the export mapping
+  is documented in §2.
 
 **This standard is published at
 <https://github.com/xcspl/xyno-okf-guide>**, alongside its reference
@@ -94,7 +95,7 @@ bundle (the only place the spec permits frontmatter in an `index.md`):
 
 ```yaml
 ---
-okf_version: "0.1"
+okf_version: "0.2"
 bundle: <dir-name>
 ---
 ```
@@ -147,26 +148,27 @@ carries:
 |---|---|
 | `tags` | YAML list; cross-cutting subjects ("what is it about"). |
 | `resource` | URI/path of the underlying asset the doc describes. |
-| `derived_from` | YAML list of repo paths this doc derives from — the staleness hook (§6). |
+| `sources` | v0.2 provenance: YAML list of *objects*, each with required `resource` plus optional credibility signals — the staleness hook (§6). See below. |
+| `generated` / `verified` / `stale_after` / `usage_window` | v0.2 trust keys, upstream meanings — see below. |
 
 Extra keys are always allowed (the spec guarantees consumers tolerate
 them). If a new key proves broadly useful, promote it into this table.
 
-### Upstream v0.2 keys — reserved, not used
+### Upstream v0.2 trust vocabulary — adopted
 
 OKF v0.2 added a *trust vocabulary* — provenance, lifecycle, and
-attestation fields — on top of v0.1. This standard does not adopt it,
-and **does not reuse any of its key names for different meanings.**
-Treat `sources`, `generated`, `verified`, `stale_after`, and
-`usage_window` as reserved: if a doc carries one, it MUST carry the
-upstream meaning below, not a house meaning.
+attestation fields — on top of v0.1. This standard **adopts it with
+upstream meanings** (adopted 2026-08-03). All trust keys are optional
+per doc; when present they MUST carry the upstream meaning — never a
+house meaning.
 
-**`sources` (upstream) — provenance, not a path list.** In v0.2 this is
-a list of *objects* recording the material a concept derives from, each
-with a required `resource` plus optional `id`, `title`, `author`,
-`usage_count`, and `last_modified`. The extra keys are credibility
-signals: v0.2 deliberately publishes signals rather than a computed
-score, leaving consumers to judge trustworthiness themselves.
+**`sources` — provenance as a list of objects.** Each entry records
+material the concept derives from: a required `resource` plus optional
+`id`, `title`, `author`, `usage_count`, and `last_modified`. The extra
+keys are credibility signals: v0.2 deliberately publishes signals
+rather than a computed score, leaving consumers to judge
+trustworthiness themselves. `resource` may be a URL or a repo path —
+repo-path entries drive the staleness query (§6 rule 3).
 
 ```yaml
 # upstream v0.2 shape — a list of objects
@@ -176,23 +178,22 @@ sources:
     title: GA4 BigQuery Export schema
     author: team:ga4-docs
     last_modified: 2026-05-30
+  - resource: ~/xynocast-okf/company/overview.md   # repo path → staleness hook
 ```
 
-This house standard had already claimed `sources` for a simpler,
-narrower idea: a flat list of repo paths driving the staleness query
-(§6 rule 3). The *intent* converges — both answer "what does this doc derive
-from, and might it have moved on?" — but the **shapes are
-incompatible**: a consumer expecting mappings would break on a list of
-strings. So the house key is named **`derived_from`**, leaving `sources`
-free to mean exactly what upstream says if this workspace ever adopts
-v0.2 provenance. The two can then coexist on one doc.
+History: before adoption this standard used a flat string list for the
+same intent, briefly renamed `derived_from` to avoid clashing with the
+upstream shape. Both forms are retired — docs were migrated to the
+object shape; if a stray flat list or `derived_from` key surfaces,
+migrate it on touch (`- <path>` → `- resource: <path>`).
 
-The other reserved keys, for reference: `generated: {by, at}` and
-`verified: [{by, at}]` record who produced or confirmed content and
-when; `stale_after: YYYY-MM-DD` declares an absolute expiry (a concept
-is stale when today >= that date).
+The other trust keys: `generated: {by, at}` and `verified: [{by, at}]`
+record who produced or confirmed content and when; `stale_after:
+YYYY-MM-DD` declares an absolute expiry (a concept is stale when today
+>= that date); `usage_window` bounds the period the content is intended
+to be used within.
 
-**`status` — same key, different vocabulary.** v0.2 defines `status` as
+**`status` — same key, house vocabulary kept.** v0.2 defines `status` as
 `draft | stable | deprecated`. This standard keeps its own five values
 (§2 above), which encode distinctions upstream cannot express —
 `superseded` and `reverted` are not the same event as `deprecated`, and
@@ -311,7 +312,7 @@ is the human/agent half of that contract.
 
 1. Extract each concept into its own doc — faithful frontmatter, correct
    `type` (pieces of one doc often want *different* types),
-   `derived_from` carried to whichever piece derives from them.
+   `sources` entries carried to whichever piece derives from them.
 2. Decide the old path's fate: keep it as the dominant concept
    (slimmed), or delete it. Either way, splitting changes concept IDs —
    grep the bundle for the old path and update every inbound link **and
@@ -378,11 +379,11 @@ chores:
 2. **Reference, don't restate:** the less a doc duplicates, the less can
    go stale. Docs carry the knowledge the project can't express (why,
    decisions, gotchas, relationships) and link to everything else.
-3. **Staleness is a query, not a feeling:** a doc with `derived_from:` is
-   stale if any listed path changed (git log / mtime) after the doc's
-   `timestamp`. Check per-repo when suspicious:
+3. **Staleness is a query, not a feeling:** a doc with `sources:` is
+   stale if any repo-path `resource` changed (git log / mtime) after the
+   doc's `timestamp`. Check per-repo when suspicious:
    ```
-   git log --oneline --since=<doc timestamp> -- <each derived_from path>
+   git log --oneline --since=<doc timestamp> -- <each sources[].resource repo path>
    ```
    Any hits → review and refresh the doc (or mark it `status: archived`).
 4. **Delete vs archive:** archive (`status: archived`) when the history
@@ -402,7 +403,7 @@ Mechanical recipe, executable in any session:
    self-identifying `index.md` (§1).
 3. **Write concept docs** from existing material — README, docs, code
    layout, git history, changelogs. Obey reference-don't-restate; type per
-   §3; house frontmatter per §2; set `derived_from:` on anything derived.
+   §3; house frontmatter per §2; set `sources:` on anything derived.
    Start small: only concepts with real content today.
 4. **Build indexes** (§5) for every bundle directory.
 5. **Validate** the bundle (§9) and fix every error.
