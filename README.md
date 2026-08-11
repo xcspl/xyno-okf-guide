@@ -85,16 +85,17 @@ copy is privileged.
 
 ## Known adoptions
 
-Public bundles known to follow this house standard:
+Bundles (private/internal) confirmed to follow this house standard:
 
-- [sumanta-okf](https://github.com/sumantagogoi/sumanta-okf) — personal
-  OKF (philosophy, projects, finance, wedding plan).
-- [xynocast-okf](https://github.com/xynocast/xynocast-okf) — primary
-  corporate OKF (XCSPL, XFPL, partners, compliance, SOPs).
-- [neet-astro](https://github.com/xcspl/neet-astro) — project repo with
-  OKF-styled `docs/` and site modules (Astro + Cloudflare R2).
+- **sumanta-okf** — personal OKF (philosophy, projects, finance, wedding plan).
+  Owns `~/sumanta-okf` on local dev machines.
+- **xynocast-okf** — primary corporate OKF (XCSPL, XFPL, partners,
+  compliance, SOPs). Owns `~/xynocast-okf`.
+- **neet-astro** — project repo with OKF-styled
+  `docs/` and site modules (Astro + Cloudflare R2). Owns `~/neet-astro`.
 
-> Open a PR to add your bundle if it follows this standard.
+Other workspaces are encouraged to fork and adopt — send a PR to add
+your bundle to this list once it validates.
 
 ## Changelog
 
