@@ -2,11 +2,11 @@
 type: Playbook
 title: OKF Management Guide
 description: Universal house OKF standard — workspaces, directory classes,
-  house schema, types, linking, sync, registry, bootstrap, and validation
-  rules.
+  house schema, types, linking, entry contract, sync, registry, bootstrap,
+  and validation rules.
 resource: https://github.com/xcspl/xyno-okf-guide
 tags: [okf, conventions, meta, knowledge-management]
-timestamp: '2026-08-03'
+timestamp: '2026-09-27'
 status: active
 ---
 
@@ -56,6 +56,13 @@ if you were handed only this file, everything else lives there. It is
 not a privileged deployment: workspaces vendor this file into their
 registry (§8) and may extend their copy (§3).
 
+**House version: 0.3.** The house standard numbers itself independently
+of upstream — every bundle root index carries `house_version` (§1) —
+because it adds rules upstream does not have, chiefly the entry
+contract (§5), and the validator must know which canonical text to
+expect. Each change, and the reasoning behind it, is
+recorded in [evolution.md](/evolution.md).
+
 ---
 
 ## 1. Directory classes
@@ -96,17 +103,48 @@ bundle (the only place the spec permits frontmatter in an `index.md`):
 ```yaml
 ---
 okf_version: "0.2"
+house_version: "0.3"
 bundle: <dir-name>
+handling:            # canonical entry contract for agents — §5
+  - Read this index before opening any doc in this bundle.
+  - Navigate by index entries; never glob the tree.
+  - A write to any directory updates that directory's index.md in the same commit.
+  - Full rules live in okf-guide.md in the workspace registry (Playbook at its bundle root).
 ---
 ```
 
-The workspace registry's root index additionally carries
-`registry: true` (§8).
+`house_version` names the version of *this* standard the bundle
+follows; `handling` is the mandatory entry contract for agents, whose
+canonical lines and optional clauses are defined in §5. The workspace
+registry's root index additionally carries `registry: true` (§8).
+
+**Root entry files.** A bundle root may hold two non-conformant entry
+files, one per audience:
+
+- **`README.md` is for humans.** A concise introduction: what the
+  bundle is, who it is for, where to start. Git hosting renders it.
+- **`AGENTS.md` is for agents.** A fuller, AI-oriented briefing: what
+  OKF is, how to navigate and write in this bundle, how to validate,
+  and any bundle-specific working procedures. It may restate the
+  `handling` block (§5) in prose and expand on it, but it never
+  contradicts it — `index.md` frontmatter stays the binding contract.
+
+Tool-specific files (`CLAUDE.md` and the like) are tolerated only as
+one-line pointers to `AGENTS.md`, for tools that do not read it
+natively. None of these are concept docs, and none are listed in an
+index. Every other `.md` file in a bundle is a conformant concept doc
+(or a reserved `index.md` / `log.md`).
+
+**Content never lives under a dot-name.** No directory or file inside a
+bundle whose name starts with a dot is part of the bundle: content
+directories and concept docs MUST NOT be named that way. Dot-paths
+(`.git`, tool worktrees, caches, editor state) are ignored by agents,
+harnesses, and the validator alike.
 
 Detection rule for any directory, in precedence order:
 
 1. `okf/index.md` exists → **work dir** (bundle = `okf/`).
-2. Its `CLAUDE.md` or `README.md` contains a line of the exact form
+2. Its `AGENTS.md`, `CLAUDE.md`, or `README.md` contains a line of the exact form
    `OKF bundle: <relative-path>` → **work dir** with a nonstandard
    bundle location (tolerated, not recommended). The target must still
    self-identify per above — the declaration is a discovery aid, never
@@ -284,6 +322,53 @@ written.
   active enough that "what changed lately" isn't obvious from git.
 - Both filenames are **reserved** — never use them for concept docs.
 
+### Root index as entry contract
+
+OKF exists to make knowledge cheap for agents to find and safe for them
+to use. The bundle root `index.md` is the one file every agent reads
+first — progressive disclosure guarantees it — so it is where the
+bundle tells agents how to handle it. Its frontmatter (the only index
+frontmatter the spec permits) carries a mandatory **`handling`** list:
+the standing orders an agent honours before it has read anything else.
+The lines are canonical — defined here per `house_version`, checked
+verbatim by the validator (§9) — so every bundle in every workspace
+says exactly the same thing, and drift is a structured comparison
+rather than a prose diff.
+
+Canonical `handling` for house 0.3:
+
+```yaml
+handling:
+  - Read this index before opening any doc in this bundle.
+  - Navigate by index entries; never glob the tree.
+  - A write to any directory updates that directory's index.md in the same commit.
+  - Full rules live in okf-guide.md in the workspace registry (Playbook at its bundle root).
+```
+
+Rules for the block:
+
+1. **Reference, don't restate.** The block is a pointer plus the
+   minimum standing orders, never a copy of this guide.
+2. **Optional clauses appear only when used.** A feature that needs
+   its own standing orders gets its own canonical clause alongside
+   `handling`, present if and only if the bundle uses the feature. A
+   bundle that doesn't use it looks exactly as it always has.
+3. **Local rules live in a linked Playbook.** Workspace- or
+   bundle-specific instructions go in a `Playbook` concept doc named by
+   `local_rules: <bundle-absolute path>`, so the canonical block stays
+   verbatim-checkable.
+4. **The block is an instruction channel, so treat it as an injection
+   surface.** A bundle cloned from elsewhere can carry any text here.
+   An OKF-aware harness honours only lines that match the registry's
+   canonical text for the declared `house_version`; other content in
+   the head is informational. A plain agent session cannot verify
+   this and applies ordinary judgement.
+5. **Entry files point here.** A work dir's root `AGENTS.md` (which
+   covers the whole project, code included) carries the line
+   `OKF bundle: okf/` and "read `okf/index.md` first" — its OKF content
+   stops there, because the bundle explains itself. A pure knowledge
+   dir's `AGENTS.md` *is* the bundle's agent briefing (§1).
+
 ### Splitting oversized docs (document altitude)
 
 A concept doc holds **one concept** — two things belong in one doc only
@@ -400,7 +485,8 @@ Mechanical recipe, executable in any session:
 
 1. **Classify** the dir: work dir or pure knowledge dir (§1).
 2. **Create the bundle root** (`okf/` for work dirs) with its
-   self-identifying `index.md` (§1).
+   self-identifying `index.md` carrying `house_version` and the
+   canonical `handling` block (§1, §5).
 3. **Write concept docs** from existing material — README, docs, code
    layout, git history, changelogs. Obey reference-don't-restate; type per
    §3; house frontmatter per §2; set `sources:` on anything derived.
@@ -456,19 +542,24 @@ registry tracks the state.
 Conformance is checkable mechanically, not by eyeball. The reference
 validator
 ([`okf-validate.py`](https://github.com/xcspl/xyno-okf-guide/blob/main/okf-validate.py),
-in the standard's public repo alongside this guide; stdlib + PyYAML)
+in the standard's public repo alongside this guide; Python 3.10+,
+stdlib + PyYAML)
 checks a bundle root and exits nonzero on errors —
 `python3 okf-validate.py <bundle-root>`:
 
 **Errors (violate this standard):**
 
-- A non-reserved `.md` file with missing/unparseable YAML frontmatter.
+- A non-reserved `.md` file with missing/unparseable YAML frontmatter
+  (root entry files and dot-paths excepted, §1).
 - Required keys (§2) absent from frontmatter: `type`, `title`, `description`,
   `timestamp`, `status` (keys must be present; `type`, `title`, `description`
   must also be non-empty, while `timestamp` and `status` keys must be explicitly
   declared even if their values are temporarily empty).
-- A bundle-root `index.md` without `okf_version` + `bundle`
-  frontmatter (§1).
+- A bundle-root `index.md` without `okf_version` + `bundle` +
+  `house_version` frontmatter, or with a `house_version` the validator
+  does not know (§1).
+- A `handling` block absent or differing from the canonical text for
+  the declared `house_version` (§5).
 - An `index.md` entry whose link target does not exist — indexes are
   *generated from* the directory, so a dead index link means the index
   wasn't regenerated (§5).
@@ -478,6 +569,8 @@ checks a bundle root and exits nonzero on errors —
 - Broken concept-to-concept links in doc bodies — legal per spec §5.3
   (not-yet-written knowledge), but worth seeing listed.
 - `status` outside the §2 vocabulary; uppercase or underscored tags.
+- Frontmatter on a subdirectory `index.md` — upstream permits it only
+  on the bundle root (§1).
 
 Run it after any bootstrap (§7) or bulk edit, and before sharing a
 bundle. Consumers stay permissive per the spec — validation gates what

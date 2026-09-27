@@ -17,9 +17,20 @@ from pathlib import Path
 import yaml
 
 RESERVED = {"index.md", "log.md"}
+ROOT_ENTRY_FILES = {"README.md", "AGENTS.md", "CLAUDE.md"}  # §1: README for humans, AGENTS for agents, tool pointers
 REQUIRED_KEYS = ("type", "title", "description", "timestamp", "status")
 STATUS_VOCAB = {"active", "idea", "superseded", "reverted", "archived"}
 LINK_RE = re.compile(r"\]\(([^)#\s]+)\)")
+
+# Canonical entry-contract text per house_version (§5).
+HANDLING = {
+    "0.3": [
+        "Read this index before opening any doc in this bundle.",
+        "Navigate by index entries; never glob the tree.",
+        "A write to any directory updates that directory's index.md in the same commit.",
+        "Full rules live in okf-guide.md in the workspace registry (Playbook at its bundle root).",
+    ],
+}
 
 
 def split_frontmatter(text: str) -> tuple[dict | None, str]:
@@ -46,21 +57,44 @@ def validate_bundle(root: Path) -> tuple[list[str], list[str]]:
     def warn(path: Path, msg: str) -> None:
         warnings.append(f"{path.relative_to(root)}: {msg}")
 
-    md_files = sorted(root.rglob("*.md"))
+    # Dot-paths (.git, tool worktrees, caches) are never part of a bundle (§1).
+    md_files = sorted(p for p in root.rglob("*.md")
+                      if not any(part.startswith(".") for part in p.relative_to(root).parts))
     if not md_files:
         errors.append(f"{root}: no markdown files found")
         return errors, warnings
 
+    # Bundle-root index: self-identification + entry contract (§1, §5).
+    root_index = root / "index.md"
+    if root_index.exists():
+        root_fm, _ = split_frontmatter(root_index.read_text(encoding="utf-8"))
+        root_fm = root_fm or {}
+        if not root_fm.get("okf_version") or not root_fm.get("bundle"):
+            err(root_index, "bundle-root index.md must carry okf_version "
+                            "and bundle frontmatter (§1)")
+        hv = root_fm.get("house_version")
+        hv = str(hv) if hv is not None else None
+        if hv is None:
+            err(root_index, "bundle-root index.md must carry house_version (§1)")
+        elif hv not in HANDLING:
+            err(root_index, f"unknown house_version '{hv}'; this validator knows "
+                            f"{sorted(HANDLING)} (§1)")
+        elif root_fm.get("handling") != HANDLING[hv]:
+            err(root_index, f"handling block absent or not the canonical text "
+                            f"for house {hv} (§5)")
+    else:
+        errors.append(f"{root}: bundle root has no index.md (§1)")
+
     for path in md_files:
+        if path.parent == root and path.name in ROOT_ENTRY_FILES:
+            continue  # §1 root entry files
         text = path.read_text(encoding="utf-8")
         fm, body = split_frontmatter(text)
 
         if path.name == "index.md":
-            # Bundle-root index must self-identify (§1).
-            if path.parent == root:
-                if not fm or not fm.get("okf_version") or not fm.get("bundle"):
-                    err(path, "bundle-root index.md must carry okf_version "
-                              "and bundle frontmatter (§1)")
+            if path.parent != root and fm is not None:
+                warn(path, "subdirectory index.md carries frontmatter; upstream "
+                           "permits it only on the bundle root (§1)")
             # Every index entry's link target must exist (§5, §9).
             for target in LINK_RE.findall(body if fm is not None else text):
                 if target.startswith(("http://", "https://", "mailto:")):

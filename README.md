@@ -1,109 +1,43 @@
 # OKF House Standard
 
-A workspace-portable standard for keeping project knowledge as plain
-markdown, built on the [Open Knowledge Format (OKF) v0.2
-spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
+A shared standard for keeping project knowledge as plain markdown that
+people and AI agents can both navigate. It builds on the [Open
+Knowledge Format (OKF)
+spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md),
+which deliberately standardizes very little, and settles everything the
+spec leaves open: where knowledge lives, what frontmatter every doc
+carries, how docs are typed and linked, how bundles stay in sync, and
+how a whole workspace of projects fits together.
 
-This guide **adopts OKF v0.2 upstream** (2026-08-03) and pins down all
-the choices the spec deliberately leaves open — directory classes, a
-house frontmatter schema, a 12-type base vocabulary, linking and
-tiering rules, write-path sync, a workspace registry, a bootstrap
-recipe, and mechanical validation. The `status` field keeps a
-five-value house vocabulary (§2) because upstream's `draft | stable |
-deprecated` cannot express the distinctions we need; the v0.2
-`sources` field (now a list of provenance objects) replaces the v0.1
-house `derived_from` key.
+**House version 0.3**, on top of OKF v0.2.
 
-OKF itself standardizes almost nothing on purpose: markdown files with
-YAML frontmatter, one required key (`type`), reserved `index.md` /
-`log.md`, links as relationships. **This guide pins down everything the
-spec leaves open** so that every project in a workspace speaks the same
-dialect.
+## What's here
 
-## Contents
+- **[okf-guide.md](okf-guide.md)**: the standard. Start here.
+- **[okf-validate.py](okf-validate.py)**: checks a bundle against the
+  standard. Run `python3 okf-validate.py <bundle-root>`; needs PyYAML.
+- **[evolution.md](evolution.md)**: what changed, when, and why.
 
-- **[okf-guide.md](okf-guide.md)** — the standard. Start here.
-- **[okf-validate.py](okf-validate.py)** — reference validator
-  (`python3 okf-validate.py <bundle-root>`; needs PyYAML). Exits
-  nonzero on standard violations; broken concept links and style drift
-  are warnings only.
+This repo follows its own standard, so it doubles as a worked example.
+AI agents should read [AGENTS.md](AGENTS.md).
 
-## The 12 base types
+## Adopting it
 
-The default type vocabulary (workspaces may extend — see guide §3):
+1. Pick your workspace root, the directory holding your projects. Its
+   `okf/` directory becomes your **registry**.
+2. Copy `okf-guide.md` into the registry unchanged.
+3. Convert projects one at a time with the guide's bootstrap recipe,
+   and run the validator on each.
 
-| Type | Use for |
-|---|---|
-| `Note` | General knowledge that fits nothing more specific. |
-| `Decision` | A choice made, its alternatives, and why. |
-| `Investigation` | A saga/debugging trail with timeline, evidence, and open/closed state. |
-| `Playbook` | Step-by-step procedure to execute on demand (this guide is one). |
-| `Reference` | Distilled external material; pointers to docs, articles, specs. |
-| `Config` | Current-truth description of a configuration/state (`resource` → the file). |
-| `Script` | Companion doc for an executable (`resource` → the script). |
-| `Service` | A running service/daemon/container and its operational knowledge. |
-| `Hardware` | A physical component and its history. |
-| `Asset` | A data/media collection (datasets, image/video libraries). |
-| `Change Record` | Historical record of a change made (what/why/commands/revert). |
-| `Project` | A unit of work — its own bundle, with its own `index.md`. |
-
-## Minimum frontmatter
-
-Every doc must have (guide §2):
-
-```yaml
----
-type: <one of the 12, or your workspace extension>
-title: <short, human-readable>
-description: <one-sentence summary>
-timestamp: <YYYY-MM-DD of last meaningful edit>   # mandatory
-status: <active | dormant | in-progress | archived | rejected>   # mandatory
----
-```
-
-Plus, on a bundle root `index.md` (guide §1):
-
-```yaml
-okf_version: "0.2"
-bundle: <work-dir | knowledge-dir>
-```
-
-## Adopting in a workspace
-
-1. Designate your workspace root (the directory that holds your project
-   dirs). Its `okf/` bundle is the **registry** (guide §8).
-2. Drop `okf-guide.md` into the registry unchanged, listed as a
-   `Playbook` in the registry's root `index.md` (which carries
-   `registry: true`).
-3. Convert directories as needed using the bootstrap recipe (guide §7),
-   validating with `okf-validate.py` (guide §9).
-
-Workspace-local type additions are expected (guide §3) — edit your
-registry's copy of the guide through whatever review your workspace
-normally uses. The guide is phrased structurally, so no deployment's
-copy is privileged.
+Workspaces are expected to extend their copy, for example with their
+own document types.
 
 ## Known adoptions
 
-Bundles (private/internal) confirmed to follow this house standard:
+Private or internal bundles that follow this standard:
 
-- **sumanta-okf** — personal OKF (philosophy, projects, finance, wedding plan).
-  Owns `~/sumanta-okf` on local dev machines.
-- **xynocast-okf** — primary corporate OKF (XCSPL, XFPL, partners,
-  compliance, SOPs). Owns `~/xynocast-okf`.
-- **neet-astro** — project repo with OKF-styled
-  `docs/` and site modules (Astro + Cloudflare R2). Owns `~/neet-astro`.
+- **sumanta-okf**: personal knowledge.
+- **xynocast-okf**: primary corporate knowledge.
+- **neet-astro**: a project repo with an OKF-styled docs bundle.
 
-Other workspaces are encouraged to fork and adopt — send a PR to add
-your bundle to this list once it validates.
-
-## Changelog
-
-- **2026-08-09** — README refreshed: adopt OKF v0.2 vocabulary, mandate
-  `timestamp` and `status` in frontmatter, list 12 base types, surface
-  the `sources` (was `derived_from`) shift. Rebased on top of three new
-  upstream commits.
-- **2026-08-03** — upstream OKF v0.2 adopted (`ed8bba0`,
-  `6647e39`, `0b0ea88`).
-- **2026-07-12** — initial house standard v0.1 (guide, validator,
-  README).
+Adopted it too? Send a PR adding your bundle once it validates.
