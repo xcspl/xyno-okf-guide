@@ -30,7 +30,7 @@ file has a bug.
 |---|---|
 | `okf-guide.md` | The standard. `Playbook`. Adopters vendor it unchanged into their workspace registry. |
 | `okf-validate.py` | Reference validator. Mechanical half of the standard; the guide's §9 is its documentation. |
-| `log.md` | History of the standard, newest first: when, what, and optionally why. No frontmatter. |
+| `log.md` | Dated history of the standard, newest first: a date heading per day, a title per entry, optional description. No frontmatter. |
 | `index.md` | Bundle root: self-identification, entry contract, listing. |
 | `README.md`, `AGENTS.md` | Root entry files. Not concept docs, not indexed. |
 
@@ -54,9 +54,9 @@ in one commit:
    the version and examples in `okf-guide.md` §1 and §5, `index.md`,
    and `README.md`.
 4. **Record it in `log.md`.** Add an entry under today's `## YYYY-MM-DD`
-   heading, newest first: a bold one-line title, a **What.** section,
-   and optionally a **Why.** section with the reasoning and rejected
-   alternatives. If an `open-questions.md` exists, remove anything that
+   heading (create it at the top if missing): a `###` title, then an
+   optional description with any detail, such as the reasoning and
+   rejected alternatives. If an `open-questions.md` exists, remove anything that
    landed, and delete the doc once it is empty.
 5. **Update `index.md`** if a doc was added, renamed, or re-described.
 6. **Validate** from the repo root:

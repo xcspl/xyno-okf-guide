@@ -317,11 +317,12 @@ written.
   write time**: whenever docs in a directory are added/renamed/
   re-described, the same commit updates that directory's `index.md` (and
   the parent's, if a subdirectory's summary changed).
-- **`log.md`** (optional, bundle root): the bundle's change history,
-  newest first, grouped under `## YYYY-MM-DD` headings. Each entry
-  records when (its date heading) and what changed, and optionally why
-  — include the why when the reason isn't obvious from the what. No
-  frontmatter (spec). Use once a bundle is active enough that its
+- **`log.md`** (optional, bundle root): the bundle's dated change
+  history, newest first. The date is the organising key: entries sit
+  under `## YYYY-MM-DD` headings, one heading per day. Each entry has a
+  **title** (a `###` heading) and an optional **description** below
+  it, which holds any detail, reasons included. No frontmatter
+  (spec). Use once a bundle is active enough that its
   history isn't obvious from git, or when its reasoning is worth
   keeping.
 - **`open-questions.md`** (optional, bundle root, house convention):

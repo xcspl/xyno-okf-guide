@@ -1,30 +1,28 @@
 # Log
 
-History of the house standard, newest first. Each entry gives when (its
-date heading), what changed, and optionally why.
+Dated history of the house standard, newest first. Entries sit under
+their date; each has a title and an optional description.
 
 ## 2026-09-27
 
-**Update: `evolution.md` becomes `log.md`.**
+### `evolution.md` becomes `log.md`
 
-**What.** `evolution.md` renamed to the reserved `log.md`, with its
-frontmatter removed as the spec requires for log files. Guide §5 now
-defines `log.md` as when, what, and optionally why, not a terse
-digest, and adds `open-questions.md` as an optional convention for
+`evolution.md` renamed to the reserved `log.md`, with its frontmatter
+removed as the spec requires for log files. Guide §5 now defines a log
+entry as a date, a title, and an optional description, rather than a
+terse digest, and adds `open-questions.md` as an optional convention for
 work that is undecided or not yet done. This repo keeps none: its two
 open items, upstream v0.2 alignment and scope, are decided and land
 next. The full scope design is in `evolution.md` at commit 28d3f4e.
 
-**Why.** `log.md` is the spec's reserved file for a bundle's change
-history, and `evolution.md` was a house invention doing the same job.
-Spec log entries are prose, so an entry can carry its reasoning. This
+`log.md` is the spec's reserved file for a bundle's change history,
+and `evolution.md` was a house invention doing the same job. Spec log
+entries are prose, so a description can carry the reasoning. This
 reverses the earlier decision to drop `log.md`: the objection was
 recording every change twice, and with one file there is no second
 copy.
 
-**Update: house 0.3, root index as entry contract; this repo becomes its own bundle.**
-
-**What.**
+### House 0.3: root index as entry contract; this repo becomes its own bundle
 
 - Root `index.md` frontmatter carries `house_version` and a mandatory,
   canonical `handling` block: the bundle's entry contract for agents.
@@ -36,7 +34,7 @@ copy.
   `evolution.md` added; the README changelog moved there.
 - The validator checks all of the above.
 
-**Why.** The guide is the rulebook, but nothing guaranteed an agent
+The guide is the rulebook, but nothing guaranteed an agent
 ever read it. Tool-specific files live outside the bundle and differ
 per harness. The one file every agent reads first is the bundle root
 `index.md`, because that is how progressive disclosure works. OKF
@@ -88,17 +86,17 @@ alone: prose can't be checked verbatim, and not every tool reads it.
 
 ## 2026-08-09
 
-**Update: README refresh.**
+### README refresh
 
-**What.** README brought in line with house 0.2: v0.2 vocabulary, mandatory
+README brought in line with house 0.2: v0.2 vocabulary, mandatory
 `timestamp` and `status`, the 12 base types, and the `sources` rename.
 No rule changes.
 
 ## 2026-08-03
 
-**Update: house 0.2, adopt upstream OKF v0.2.**
+### House 0.2: adopt upstream OKF v0.2
 
-**What.** Upstream
+Upstream
 ([spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md))
 added a trust vocabulary (`sources` as provenance objects,
 `generated`, `verified`, `stale_after`, `usage_window`). Adopted with
@@ -110,9 +108,9 @@ became mandatory-even-if-empty keys to make knowledge decay visible.
 
 ## 2026-07-12
 
-**Creation: house 0.1, initial standard.**
+### House 0.1: initial standard
 
-**What.** Guide, reference validator, README. Fixed the choices the spec leaves
+Guide, reference validator, README. Fixed the choices the spec leaves
 open: two directory classes, house frontmatter schema, 12 base types,
 three linking rules, write-path sync, a workspace registry, bootstrap
 recipe, mechanical validation.

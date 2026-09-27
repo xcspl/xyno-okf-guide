@@ -20,4 +20,4 @@ itself. Start with the guide.
 
 # Meta
 
-* [Log](log.md) - History of the house standard, newest first — when, what changed, and why.
+* [Log](log.md) - Dated history of the house standard, newest first.
