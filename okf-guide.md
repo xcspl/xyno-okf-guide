@@ -61,7 +61,7 @@ of upstream — every bundle root index carries `house_version` (§1) —
 because it adds rules upstream does not have, chiefly the entry
 contract (§5), and the validator must know which canonical text to
 expect. Each change, and the reasoning behind it, is
-recorded in [evolution.md](/evolution.md).
+recorded in this repo's [log.md](/log.md).
 
 ---
 
@@ -317,9 +317,18 @@ written.
   write time**: whenever docs in a directory are added/renamed/
   re-described, the same commit updates that directory's `index.md` (and
   the parent's, if a subdirectory's summary changed).
-- **`log.md`** (optional, bundle root): reverse-chronological digest of
-  bundle changes under `## YYYY-MM-DD` headings. Use once a bundle is
-  active enough that "what changed lately" isn't obvious from git.
+- **`log.md`** (optional, bundle root): the bundle's change history,
+  newest first, grouped under `## YYYY-MM-DD` headings. Each entry
+  records when (its date heading) and what changed, and optionally why
+  — include the why when the reason isn't obvious from the what. No
+  frontmatter (spec). Use once a bundle is active enough that its
+  history isn't obvious from git, or when its reasoning is worth
+  keeping.
+- **`open-questions.md`** (optional, bundle root, house convention):
+  an ordinary concept doc (`type: Note`) listing what is undecided, or
+  decided but not yet done. Items leave it when they land, recorded in
+  `log.md`; the doc is deleted once it is empty. Unlike the two
+  reserved files, it carries full frontmatter.
 - Both filenames are **reserved** — never use them for concept docs.
 
 ### Root index as entry contract

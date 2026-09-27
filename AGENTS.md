@@ -30,7 +30,7 @@ file has a bug.
 |---|---|
 | `okf-guide.md` | The standard. `Playbook`. Adopters vendor it unchanged into their workspace registry. |
 | `okf-validate.py` | Reference validator. Mechanical half of the standard; the guide's §9 is its documentation. |
-| `evolution.md` | History of the standard: what changed, when, why, and what is still open. |
+| `log.md` | History of the standard, newest first: when, what, and optionally why. No frontmatter. |
 | `index.md` | Bundle root: self-identification, entry contract, listing. |
 | `README.md`, `AGENTS.md` | Root entry files. Not concept docs, not indexed. |
 
@@ -53,10 +53,11 @@ in one commit:
    validator's canonical tables without deleting old ones, then update
    the version and examples in `okf-guide.md` §1 and §5, `index.md`,
    and `README.md`.
-4. **Record it in `evolution.md`.** Add a timeline entry under today's
-   date: a one-line summary of what changed, then the problem, the
-   decision, and the alternatives rejected. Move anything decided off
-   the open-questions list. There is no `log.md`; git covers the rest.
+4. **Record it in `log.md`.** Add an entry under today's `## YYYY-MM-DD`
+   heading, newest first: a bold one-line title, a **What.** section,
+   and optionally a **Why.** section with the reasoning and rejected
+   alternatives. If an `open-questions.md` exists, remove anything that
+   landed, and delete the doc once it is empty.
 5. **Update `index.md`** if a doc was added, renamed, or re-described.
 6. **Validate** from the repo root:
 
@@ -69,7 +70,7 @@ in one commit:
 
 ## Conventions
 
-- **One concept per doc.** When a rationale in `evolution.md` outgrows
+- **One concept per doc.** When a rationale in `log.md` outgrows
   its entry, split it into a `Decision` doc under `decisions/`, link it
   from the timeline, and add a `decisions/index.md`.
 - **Filenames kebab-case, tags lowercase-hyphenated.**
@@ -84,7 +85,7 @@ in one commit:
 The OKF spec lives at
 <https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md>.
 This standard currently adopts OKF v0.2. When upstream moves, record
-the review in `evolution.md` whether or not anything is adopted.
+the review in `log.md` whether or not anything is adopted.
 
 ## After a change lands
 

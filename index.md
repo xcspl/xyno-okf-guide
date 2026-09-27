@@ -20,4 +20,4 @@ itself. Start with the guide.
 
 # Meta
 
-* [Evolution of the house standard](evolution.md) - History of the guide itself — what changed, when, why, and what is still open.
+* [Log](log.md) - History of the house standard, newest first — when, what changed, and why.
