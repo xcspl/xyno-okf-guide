@@ -6,7 +6,7 @@ description: Universal house OKF standard — workspaces, directory classes,
   and validation rules.
 resource: https://github.com/xcspl/xyno-okf-guide
 tags: [okf, conventions, meta, knowledge-management]
-timestamp: '2026-09-27'
+timestamp: '2026-10-06'
 status: active
 ---
 
@@ -118,8 +118,8 @@ follows; `handling` is the mandatory entry contract for agents, whose
 canonical lines and optional clauses are defined in §5. The workspace
 registry's root index additionally carries `registry: true` (§8).
 
-**Root entry files.** A bundle root may hold two non-conformant entry
-files, one per audience:
+**Root entry files.** A bundle root may hold three non-conformant
+entry files, one per audience:
 
 - **`README.md` is for humans.** A concise introduction: what the
   bundle is, who it is for, where to start. Git hosting renders it.
@@ -128,6 +128,11 @@ files, one per audience:
   and any bundle-specific working procedures. It may restate the
   `handling` block (§5) in prose and expand on it, but it never
   contradicts it — `index.md` frontmatter stays the binding contract.
+- **`SKILL.md` is for skill-aware harnesses.** A skill file — `name`
+  and `description` frontmatter, then the operating procedure — that a
+  harness loads automatically when a task touches a bundle, instead of
+  waiting to be told. Install it by copying it into the harness's
+  skills directory; it is the portable form of this standard.
 
 Tool-specific files (`CLAUDE.md` and the like) are tolerated only as
 one-line pointers to `AGENTS.md`, for tools that do not read it

@@ -3,6 +3,20 @@
 Dated history of the house standard, newest first. Entries sit under
 their date; each has a title and an optional description.
 
+## 2026-10-06
+
+### `SKILL.md`: the standard becomes an installable skill
+
+The repo now carries `SKILL.md` at its root — a harness skill (`name` +
+`description` frontmatter, then the entry procedure) that an agent loads
+automatically when a task touches an OKF bundle, instead of having to be told
+the standard exists. §1 now permits three root entry files: README for humans,
+AGENTS for agents, SKILL for skill-aware harnesses. `okf-validate.py` skips it
+via `ROOT_ENTRY_FILES`, so the bundle stays valid without it becoming a concept
+doc. No `house_version` bump: the canonical `handling` text is unchanged, so
+adopting workspaces are unaffected. Install by copying the file into a
+harness's skills directory, e.g. `~/.config/kilo/skills/okf-guide/SKILL.md`.
+
 ## 2026-09-27
 
 ### `evolution.md` becomes `log.md`

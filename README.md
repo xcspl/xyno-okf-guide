@@ -17,6 +17,9 @@ how a whole workspace of projects fits together.
 - **[okf-validate.py](okf-validate.py)**: checks a bundle against the
   standard. Run `python3 okf-validate.py <bundle-root>`; needs PyYAML.
 - **[log.md](log.md)**: dated history of changes, newest first.
+- **[SKILL.md](SKILL.md)**: the standard as an agent skill — copy it into
+  a harness's skills dir (e.g. `~/.config/kilo/skills/okf-guide/`,
+  `~/.claude/skills/okf-guide/`) so agents load it automatically.
 
 This repo follows its own standard, so it doubles as a worked example.
 AI agents should read [AGENTS.md](AGENTS.md).

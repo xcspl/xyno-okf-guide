@@ -32,7 +32,7 @@ file has a bug.
 | `okf-validate.py` | Reference validator. Mechanical half of the standard; the guide's §9 is its documentation. |
 | `log.md` | Dated history of the standard, newest first: a date heading per day, a title per entry, optional description. No frontmatter. |
 | `index.md` | Bundle root: self-identification, entry contract, listing. |
-| `README.md`, `AGENTS.md` | Root entry files. Not concept docs, not indexed. |
+| `README.md`, `AGENTS.md`, `SKILL.md` | Root entry files. Not concept docs, not indexed. `SKILL.md` is the harness skill. |
 
 Every other `.md` must carry the house frontmatter: `type`, `title`,
 `description`, `timestamp`, `status`.

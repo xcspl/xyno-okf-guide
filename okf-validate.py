@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 RESERVED = {"index.md", "log.md"}
-ROOT_ENTRY_FILES = {"README.md", "AGENTS.md", "CLAUDE.md"}  # §1: README for humans, AGENTS for agents, tool pointers
+ROOT_ENTRY_FILES = {"README.md", "AGENTS.md", "CLAUDE.md", "SKILL.md"}  # §1: README for humans, AGENTS for agents, SKILL for skill-aware harnesses, tool pointers
 REQUIRED_KEYS = ("type", "title", "description", "timestamp", "status")
 STATUS_VOCAB = {"active", "idea", "superseded", "reverted", "archived"}
 LINK_RE = re.compile(r"\]\(([^)#\s]+)\)")
